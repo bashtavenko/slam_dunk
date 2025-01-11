@@ -1,0 +1,32 @@
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+buildifier(
+    name = "buildifier",
+    exclude_patterns = [
+        "./bazel-*/*",
+        "./.git/*",
+    ],
+    lint_mode = "fix",
+)
+
+cc_library(
+    name = "sdk",
+    srcs = ["third_party/rplidar/libsl_lidar_sdk.a"],
+    hdrs = glob(["third_party/rplidar/include/**/*.h"]),
+)
+
+cc_binary(
+    name = "playground_main",
+    srcs = ["playground_main.cc"],
+    deps = [
+        "sdk",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/strings:str_format",
+        "@gflags",
+        "@glog",
+    ],
+)

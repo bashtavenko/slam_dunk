@@ -1,2 +1,1 @@
-# slam-dunk
-SLAM and lidar exploration
+# SLAM and lidar exploration

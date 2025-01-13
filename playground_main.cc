@@ -1,23 +1,47 @@
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/memory/memory.h"
 #include "absl/strings/str_format.h"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
+#include "lidar.h"
 #include "third_party/rplidar/include/sl_lidar_driver.h"
 
 ABSL_FLAG(std::string, usb_port, "/dev/ttyUSB0", "USB port");
 ABSL_FLAG(int32_t, baud_rate, 115200, "Default baud rate for A1");
 
+absl::Status RunLidar() {
+  using slam_dunk::Lidar;
+  auto lidar = Lidar::Create(absl::GetFlag(FLAGS_usb_port),
+                             absl::GetFlag(FLAGS_baud_rate));
+  if (!lidar.ok()) return lidar.status();
+
+  auto result = lidar.value()->Scan();
+  if (!result.ok()) return result.status();
+
+  for (const auto& response : result.value()) {
+    LOG(INFO) << absl::StreamFormat(
+        "Theta: %03.2f Dist: %08.2f Q: %d F: 0%x",
+        response.theta * 90.f / 16384.f, response.distance_mm / 4.0f,
+        response.quality >> SL_LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT,
+        response.flag);
+  }
+
+  return absl::OkStatus();
+}
+
 int Run() {
   auto driver_result = sl::createLidarDriver();
   CHECK(driver_result);
-  std::unique_ptr<sl::ILidarDriver> driver(driver_result.value);
+  std::unique_ptr<sl::ILidarDriver> driver =
+      absl::WrapUnique(driver_result.value);
   CHECK(driver);
 
   auto channel_status = sl::createSerialPortChannel(
       absl::GetFlag(FLAGS_usb_port), absl::GetFlag(FLAGS_baud_rate));
   CHECK(channel_status);
-  std::unique_ptr<sl::IChannel> channel(channel_status.value);
+  std::unique_ptr<sl::IChannel> channel =
+      absl::WrapUnique(channel_status.value);
   CHECK(channel);
 
   sl_result status = SL_RESULT_OK;
@@ -34,7 +58,7 @@ int Run() {
   }
 
   driver->startScan(/*force=*/false, /*useTypicalScan=*/true);
-  sl_lidar_response_measurement_node_hq_t nodes[1000];
+  sl_lidar_response_measurement_node_hq_t nodes[360];
   size_t count = sizeof(nodes) / sizeof(nodes[0]);
   status = driver->grabScanDataHq(nodes, count);
   if (SL_IS_FAIL(status)) {
@@ -58,5 +82,11 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(*argv);
   absl::ParseCommandLine(argc, argv);
   gflags::SetCommandLineOption("logtostderr", "1");
-  return Run();
+  //  return Run();
+  absl::Status status = RunLidar();
+  if (!status.ok()) {
+    LOG(ERROR) << status.message();
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }

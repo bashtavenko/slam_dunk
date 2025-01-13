@@ -23,10 +23,25 @@ cc_binary(
     srcs = ["playground_main.cc"],
     deps = [
         "sdk",
+        ":lidar",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
+        "@absl//absl/memory",
+        "@absl//absl/status",
         "@absl//absl/strings:str_format",
         "@gflags",
         "@glog",
+    ],
+)
+
+cc_library(
+    name = "lidar",
+    srcs = ["lidar.cc"],
+    hdrs = ["lidar.h"],
+    deps = [
+        ":sdk",
+        "@absl//absl/memory",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings:str_format",
     ],
 )

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package slam_dunk.proto;
+
+message ScanItem {
+  uint32 theta = 1;
+  uint32 distance_mm = 2;
+  uint32 quality = 3;
+  uint32 flag = 4;
+}
+
+message ScanResponse {
+  repeated ScanItem items = 1;
+}
+

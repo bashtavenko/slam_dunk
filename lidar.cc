@@ -43,7 +43,12 @@ absl::StatusOr<std::unique_ptr<Lidar>> Lidar::Create(absl::string_view usb_port,
         absl::StrFormat("Failed to getDeviceInfo: 0%x", status));
   }
 
-  driver->startScan(/*force=*/false, /*useTypicalScan=*/true);
+  std::vector<sl::LidarScanMode> scan_modes;
+  driver->getAllSupportedScanModes(scan_modes);
+  if (scan_modes.empty()) {
+    return absl::InternalError("No supported scan modes.");
+  }
+  driver->startScan(  /*force=*/false, scan_modes[0].id);
 
   return absl::WrapUnique(
       new Lidar(std::move(driver), std::move(channel), device_info));

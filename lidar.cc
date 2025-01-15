@@ -1,6 +1,8 @@
 #include "lidar.h"
 #include <algorithm>
 #include "absl/memory/memory.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
 
 namespace slam_dunk {
 
@@ -14,6 +16,19 @@ Lidar::Lidar(std::unique_ptr<sl::ILidarDriver> driver,
 Lidar::~Lidar() {
   driver_->stop();
   driver_->disconnect();
+}
+
+DeviceInfo Lidar::GetDeviceInfo() const {
+  DeviceInfo device_info;
+  device_info.firmware =
+      absl::StrFormat("%d.%02d", device_info_.firmware_version >> 8,
+                      device_info_.firmware_version & 0xFF);
+  device_info.hardware = absl::StrCat(device_info_.hardware_version);
+  device_info.model = absl::StrCat(device_info_.model);
+  for (uint8_t n : device_info_.serialnum) {
+    device_info.serial_number += absl::StrFormat("%02X", n);
+  }
+  return device_info;
 }
 
 absl::StatusOr<std::unique_ptr<Lidar>> Lidar::Create(absl::string_view usb_port,
@@ -48,7 +63,7 @@ absl::StatusOr<std::unique_ptr<Lidar>> Lidar::Create(absl::string_view usb_port,
   if (scan_modes.empty()) {
     return absl::InternalError("No supported scan modes.");
   }
-  driver->startScan(  /*force=*/false, scan_modes[0].id);
+  driver->startScan(/*force=*/false, scan_modes[0].id);
 
   return absl::WrapUnique(
       new Lidar(std::move(driver), std::move(channel), device_info));

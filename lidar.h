@@ -37,14 +37,29 @@ struct ScanResponse {
   }
 };
 
+// Lidar parameters
+struct DeviceInfo {
+  std::string model;
+  std::string firmware;
+  std::string hardware;
+  std::string serial_number;
+};
+
+// Aggregation of Slamtec RPLidar.
 class Lidar {
  public:
+  // Creates lidar with given parameters
   static absl::StatusOr<std::unique_ptr<Lidar>> Create(
       absl::string_view usb_port, int32_t baud_rate);
   ~Lidar();
 
+  // Returns response for the given number of node (points)
   absl::StatusOr<std::vector<ScanResponse>>Scan(size_t count = 8192);
 
+  // Returns information about initiated lidar.
+  DeviceInfo GetDeviceInfo() const;
+
+  // Not copyable
   Lidar(const Lidar&) = delete;
   Lidar& operator=(const Lidar&) = delete;
 

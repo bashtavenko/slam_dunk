@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "plot",
+    srcs = ["plot.cc", "//qt/resources"],
+    hdrs = ["plot.h"],
+    deps = [
+        "//:qt",
+        "@absl//absl/memory",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings",
+        "//:lidar",
+    ],
+)
+
+filegroup(
+    name = "qmls",
+    srcs = glob(["*.qml"])
+)

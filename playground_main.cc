@@ -7,6 +7,7 @@
 #include "glog/logging.h"
 #include "lidar.h"
 #include "proto/lidar_response.pb.h"
+#include "qt/plot.h"
 
 ABSL_FLAG(std::string, usb_port, "/dev/ttyUSB0", "USB port");
 ABSL_FLAG(int32_t, baud_rate, 115200, "Default baud rate for A1");
@@ -60,12 +61,26 @@ absl::Status RunLidar() {
   return absl::OkStatus();
 }
 
+absl::Status ShowPlotFromData(int argc, char** argv) {
+  using slam_dunk::Plot;
+  using slam_dunk::ScanResponse;
+  auto plot_status = Plot::Create(argc, argv);
+  if (!plot_status.ok()) return plot_status.status();
+
+  auto& plot = plot_status.value();
+  std::vector<ScanResponse> data;
+  auto run_status = plot->Run(data);
+
+  return absl::OkStatus();
+}
+
 int main(int argc, char** argv) {
   google::InitGoogleLogging(*argv);
   absl::ParseCommandLine(argc, argv);
   gflags::SetCommandLineOption("logtostderr", "1");
+  absl::Status status = ShowPlotFromData(argc, argv);
 
-  absl::Status status = RunLidar();
+  //  absl::Status status = RunLidar();
   if (!status.ok()) {
     LOG(ERROR) << status.message();
     return EXIT_FAILURE;

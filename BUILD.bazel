@@ -1,6 +1,8 @@
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
+package(default_visibility = ["//visibility:public"])
+
 buildifier(
     name = "buildifier",
     exclude_patterns = [
@@ -19,8 +21,11 @@ cc_library(
 cc_binary(
     name = "playground_main",
     srcs = ["playground_main.cc"],
+    # TODO: This should work //qt:plot.qml, but it does not.
+    data = ["plot.qml"],
     deps = [
         "sdk",
+        "//qt:plot",
         ":lidar",
         "//proto:lidar_proto_cc",
         "@absl//absl/flags:flag",
@@ -42,5 +47,17 @@ cc_library(
         "@absl//absl/memory",
         "@absl//absl/status:statusor",
         "@absl//absl/strings:str_format",
+    ],
+)
+
+cc_library(
+    name = "qt",
+    hdrs = glob(["third_party/qt/include/**/*.h"]),
+    linkopts = [
+        "-lQt6Widgets",
+        "-lQt6Core",
+        "-lQt6Gui",
+        "-lQt6Quick",
+        "-lQt6Qml",
     ],
 )

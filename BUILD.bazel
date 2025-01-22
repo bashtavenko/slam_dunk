@@ -22,12 +22,13 @@ cc_binary(
     name = "playground_main",
     srcs = ["playground_main.cc"],
     # TODO: This should work //qt:plot.qml, but it does not.
+    # Requires symlinking.
     data = ["plot.qml"],
     deps = [
         "sdk",
-        "//qt:plot",
         ":lidar",
         "//proto:lidar_proto_cc",
+        "//qt:plot",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
         "@absl//absl/memory",
@@ -54,10 +55,10 @@ cc_library(
     name = "qt",
     hdrs = glob(["third_party/qt/include/**/*.h"]),
     linkopts = [
+        "-lQt6Charts",
         "-lQt6Widgets",
         "-lQt6Core",
         "-lQt6Gui",
         "-lQt6Quick",
-        "-lQt6Qml",
     ],
 )

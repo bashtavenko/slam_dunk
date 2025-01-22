@@ -1,45 +1,16 @@
-import QtQuick
-import QtQuick.Window
+import QtQuick 2.0
+import QtCharts 2.0
 
-Window {
-    width: 640
-    height: 480
-    visible: true
-    title: qsTr("Hello World")
+ChartView {
+    id: chart
+    width: 400
+    height: 300
 
-    Rectangle {
-        width: 240
-        height: 240
-        anchors.centerIn: parent
-        color: '#CCCCCC'
+    title: "My Chart"
 
-        Rectangle {
-            width: 40
-            height: 40
-            anchors.centerIn: parent
-            color: '#FFBB33'
-        }
-    }
-
-    Rectangle {
-        id: rect1
-        x: 12; y: 100
-        width: 76; height: 96
-        color: "lightsteelblue"
-    }
-    Rectangle {
-        id: rect2
-        x: 112; y: 100
-        width: 76; height: 96
-        border.color: "lightsteelblue"
-        border.width: 4
-        radius: 8
-    }
-
-    Text {
-        text: "The quick brown fox"
-        color: "#303030"
-        font.family: "Ubuntu"
-        font.pixelSize: 28
+    LineSeries {
+        name: "Data"
+        XYPoint { x: 0; y: 0 }
+        XYPoint { x: 1; y: 1 }
     }
 }

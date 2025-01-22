@@ -4,4 +4,3 @@ filegroup(
     name = "resources",
     srcs = glob(["**/*"]),
 )
-

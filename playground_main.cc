@@ -20,6 +20,7 @@ absl::Status SaveResponse(
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   slam_dunk::proto::ScanResponse proto_response;
   for (const auto& item : scan_response) {
+    if (item.theta == 0 || item.distance_mm == 0) continue;
     auto p = proto_response.add_items();
     p->set_theta(item.theta);
     p->set_distance_mm(item.distance_mm);
@@ -78,9 +79,9 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(*argv);
   absl::ParseCommandLine(argc, argv);
   gflags::SetCommandLineOption("logtostderr", "1");
-  absl::Status status = ShowPlotFromData(argc, argv);
+//  absl::Status status = ShowPlotFromData(argc, argv);
 
-  //  absl::Status status = RunLidar();
+  absl::Status status = RunLidar();
   if (!status.ok()) {
     LOG(ERROR) << status.message();
     return EXIT_FAILURE;

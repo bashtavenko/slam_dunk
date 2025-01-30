@@ -19,11 +19,13 @@ cc_library(
 )
 
 cc_binary(
-    name = "playground_main",
-    srcs = ["playground_main.cc"],
+    name = "runner_main",
+    srcs = ["runner_main.cc"],
+    data = ["//testdata"],
     deps = [
         "sdk",
         ":lidar",
+        ":visualizer_client",
         "//proto:lidar_proto_cc",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
@@ -45,4 +47,14 @@ cc_library(
         "@absl//absl/status:statusor",
         "@absl//absl/strings:str_format",
     ],
+)
+
+cc_library(
+    name = "visualizer_client",
+    srcs = ["visualizer_client.cc"],
+    hdrs = ["visualizer_client.h"],
+    deps = ["@absl//absl/memory",
+            "@absl//absl/status:statusor",
+            "@absl//absl/strings",
+            "@absl//absl/types:optional"],
 )

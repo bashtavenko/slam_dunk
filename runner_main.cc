@@ -35,7 +35,8 @@ absl::StatusOr<std::string> ConvertScanResponseToTextProtoString(
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   slam_dunk::proto::ScanResponse proto_response;
   for (const auto& item : scan_response) {
-    if (item.theta == 0 || item.distance_mm == 0) continue;
+    // Uncomment this line to ignore zeros
+    // if (item.theta == 0 || item.distance_mm == 0) continue;
     auto p = proto_response.add_items();
     p->set_theta(item.theta);
     p->set_distance_mm(item.distance_mm);

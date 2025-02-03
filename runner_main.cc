@@ -21,6 +21,7 @@
 #include "glog/logging.h"
 #include "lidar.h"
 #include "proto/lidar_response.pb.h"
+#include "proto_utils.h"
 #include "visualizer_client.h"
 
 ABSL_FLAG(std::string, usb_port, "", "USB port");
@@ -30,56 +31,21 @@ ABSL_FLAG(std::string, in_path, "",
           "Input path for the file in text proto format.");
 ABSL_FLAG(int32_t, baud_rate, 115200, "Default baud rate for A1");
 
-absl::StatusOr<std::string> ConvertScanResponseToTextProtoString(
-    const std::vector<slam_dunk::ScanResponse>& scan_response) {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-  slam_dunk::proto::ScanResponse proto_response;
-  for (const auto& item : scan_response) {
-    // Uncomment this line to ignore zeros
-    // if (item.theta == 0 || item.distance_mm == 0) continue;
-    auto p = proto_response.add_items();
-    p->set_theta(item.theta);
-    p->set_distance_mm(item.distance_mm);
-    p->set_quality(item.quality);
-    p->set_flag(item.flag);
-  }
-  std::string proto_text;
-  if (!google::protobuf::TextFormat::PrintToString(proto_response,
-                                                   &proto_text)) {
-    return absl::InternalError("Failed in TextFormat::PrintToString");
-  }
-  return proto_text;
-}
-
 // Gets one scan and saves response into file with
 // text proto format.
 absl::Status ScanAndSaveResponse(slam_dunk::Lidar& lidar) {
   auto scan_data = lidar.Scan();
   if (!scan_data.ok()) return scan_data.status();
-  auto data = ConvertScanResponseToTextProtoString(scan_data.value());
-  if (!data.ok()) return data.status();
-
-  std::ofstream output_file(absl::GetFlag(FLAGS_out_path));
-  if (!output_file) {
-    return absl::InternalError(
-        absl::StrCat("Failed to write to ", absl::GetFlag(FLAGS_out_path)));
-  }
-  output_file << data.value();
-  output_file.close();
-  return absl::OkStatus();
+  return slam_dunk::SaveToFile(scan_data.value(),
+                               absl::GetFlag(FLAGS_out_path));
 }
 
 absl::Status VisualizeFromFile(slam_dunk::VisualizerClient& client) {
-  std::ifstream file(absl::GetFlag(FLAGS_in_path));
-  std::string data((std::istreambuf_iterator<char>(file)),
-                   std::istreambuf_iterator<char>());
+  absl::StatusOr<std::string> file_data =
+      slam_dunk::GetTextFromFile(absl::GetFlag(FLAGS_in_path));
+  if (!file_data.ok()) return file_data.status();
 
-  if (data.empty()) {
-    return absl::InternalError("Failed to open data file " +
-                               absl::GetFlag(FLAGS_in_path));
-  }
-
-  auto result = client.SendData(data);
+  auto result = client.SendData(file_data->data());
   if (!result.has_value())
     return absl::InternalError("Failed to send data Visualizer");
   LOG(INFO) << "Sent data to Visualizer: " << result.value();

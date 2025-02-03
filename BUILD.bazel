@@ -25,8 +25,8 @@ cc_binary(
     deps = [
         "sdk",
         ":lidar",
+        ":proto_utils",
         ":visualizer_client",
-        "//proto:lidar_proto_cc",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
         "@absl//absl/memory",
@@ -53,8 +53,31 @@ cc_library(
     name = "visualizer_client",
     srcs = ["visualizer_client.cc"],
     hdrs = ["visualizer_client.h"],
-    deps = ["@absl//absl/memory",
-            "@absl//absl/status:statusor",
-            "@absl//absl/strings",
-            "@absl//absl/types:optional"],
+    deps = [
+        "@absl//absl/memory",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings",
+        "@absl//absl/types:optional",
+    ],
+)
+
+cc_library(
+    name = "proto_utils",
+    srcs = ["proto_utils.cc"],
+    hdrs = ["proto_utils.h"],
+    deps = [
+        ":lidar",
+        "//proto:lidar_proto_cc",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "proto_utils_test",
+    srcs = ["proto_utils_test.cc"],
+    deps = [
+        ":proto_utils",
+        "@googletest//:gtest_main",
+    ],
 )

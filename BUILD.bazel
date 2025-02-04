@@ -78,6 +78,8 @@ cc_test(
     srcs = ["proto_utils_test.cc"],
     deps = [
         ":proto_utils",
+        "@absl//absl/status:status_matchers",
+        "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
     ],
 )

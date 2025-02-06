@@ -34,7 +34,7 @@ cc_binary(
         "@absl//absl/strings:str_format",
         "@gflags",
         "@glog",
-        "@status_macros//:status_macros"
+#        "@status_macros//:status_macros"
     ],
 )
 

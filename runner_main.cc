@@ -11,7 +11,6 @@
 // blaze run //:runner_main -- --usb_port=/dev/ttyUSB0
 // --out_path=/tmp/lidar.txtpb
 
-#include <google/protobuf/text_format.h>
 #include <fstream>
 #include <iostream>
 #include "absl/flags/flag.h"
@@ -63,7 +62,6 @@ absl::Status ShowRealTimeData(slam_dunk::Lidar& lidar,
     if (!result.has_value())
       return absl::InternalError("Failed to send data to visualizer");
   }
-  return absl::OkStatus();
 }
 
 int main(int argc, char** argv) {

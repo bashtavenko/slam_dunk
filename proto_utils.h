@@ -8,8 +8,6 @@
 
 namespace slam_dunk {
 
-absl::StatusOr<std::string> Foo();
-
 absl::StatusOr<std::string> ConvertScanResponseToTextProtoString(
     const std::vector<slam_dunk::ScanResponse>& scan_response);
 

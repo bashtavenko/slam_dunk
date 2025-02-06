@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 #include "lidar.h"
 #include "proto/lidar_response.pb.h"
+#include "protobuf-matchers/protocol-buffer-matchers.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
 namespace slam_dunk {
@@ -13,6 +14,7 @@ namespace {
 using ::absl_testing::IsOk;
 using ::absl_testing::IsOkAndHolds;
 using ::bazel::tools::cpp::runfiles::Runfiles;
+using ::protobuf_matchers::EqualsProto;
 using ::testing::HasSubstr;
 using ::testing::NotNull;
 
@@ -26,6 +28,12 @@ TEST(ScanResponseToTextProtoString, Works) {
   slam_dunk::proto::ScanResponse message;
   ASSERT_TRUE(google::protobuf::TextFormat::ParseFromString(text_proto.value(),
                                                             &message));
+
+  EXPECT_THAT(
+      message,
+      EqualsProto(
+          R"pb(items { theta: 5566 distance_mm: 2257 quality: 60 }
+               items { theta: 5822 distance_mm: 2243 quality: 60 })pb"));
 }
 
 TEST(SaveAndGetFile, Works) {

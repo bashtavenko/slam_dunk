@@ -1,0 +1,14 @@
+cc_library(
+    name = "kalman_filter",
+    hdrs = ['kalman_filter.h'],
+    srcs = ["kalman_filter.cc"],
+    deps = ["@eigen//:eigen"],
+)
+
+cc_test(
+    name = "kalman_filter_test",
+    srcs = ["kalman_filter_test.cc"],
+    deps = [":kalman_filter",
+            "@googletest//:gtest_main",
+            "@eigen//:eigen"],
+)

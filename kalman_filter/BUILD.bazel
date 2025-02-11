@@ -10,5 +10,7 @@ cc_test(
     srcs = ["kalman_filter_test.cc"],
     deps = [":kalman_filter",
             "@googletest//:gtest_main",
+            "@glog",
+            "@absl//absl/strings:str_format",
             "@eigen//:eigen"],
 )

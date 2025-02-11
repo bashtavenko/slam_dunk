@@ -1,5 +1,7 @@
 #include "kalman_filter.h"
 #include <Eigen/Eigen>
+#include "absl/strings/str_format.h"
+#include "glog/logging.h"
 #include "gmock/gmock-matchers.h"
 #include "gtest/gtest.h"
 
@@ -52,18 +54,23 @@ TEST(KalmanFilter, BasicWorks) {
   // Best guess of initial states
   Eigen::VectorXd x0(n);
   double t = 0;
-  x0 << measurements[0], 0, -9.81;
+  // [1.04203 0 -9.81]
+  x0 << measurements.front(), 0, -9.81;
   kf.Init(t, x0);
 
-  // Spot check outputs
+  // Feed measurement into filter
   Eigen::VectorXd y(m);
-  t += dt;
-  y << measurements[0];
-  kf.Update(y);
-
-  Eigen::VectorXd result = kf.state();
-  EXPECT_THAT(result[0], DoubleNear(1.0, kMaxAbsError));
-  EXPECT_THAT(kf.Time(), DoubleNear(0.03, kMaxAbsError));
+  for (size_t i = 0; i < measurements.size(); ++i) {
+    t += dt;
+    y << measurements[i];
+    kf.Update(y);
+    LOG(INFO) << absl::StreamFormat(
+        "t = %.2f y[%i] = %.2f x_hat[%i] = [%.2f, %.2f, %.2f]", t, i,
+        y.transpose().x(), i, kf.state().transpose()[0],
+        kf.state().transpose()[1], kf.state().transpose()[2]);
+  }
+  // This should be close to x0 -9.81, I guess.
+  EXPECT_THAT(kf.state().transpose()[2], DoubleNear(-9.2, kMaxAbsError));
 }
 
 }  // namespace

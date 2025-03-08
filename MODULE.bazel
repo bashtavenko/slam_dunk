@@ -12,15 +12,8 @@ bazel_dep(name = "protobuf-matchers", version = "0.1.0")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-#http_archive(
-#   name = "status_macros",
-#   strip_prefix = "status_macros-0.0.1",
-#   urls = ["https://github.com/jimrogerz/status_macros/archive/refs/tags/v0.0.1.tar.gz"],
-#)
-
-STATUS_MACROS_COMMIT = "c2fcdb9b0d29ae60470c98c0f6f8ea42daad942c"
 http_archive(
     name = "status_macros",
-    strip_prefix = "status_macros-" + STATUS_MACROS_COMMIT,
-    url = "https://github.com/jimrogerz/status_macros/archive/%s.zip" % STATUS_MACROS_COMMIT,
+    strip_prefix = "status_macros-1.0.1",
+    urls = ["https://github.com/bashtavenko/status_macros/archive/refs/tags/v1.0.1.tar.gz"],
 )

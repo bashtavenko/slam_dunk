@@ -34,7 +34,7 @@ cc_binary(
         "@absl//absl/strings:str_format",
         "@gflags",
         "@glog",
-#        "@status_macros//:status_macros"
+        "@status_macros",
     ],
 )
 
@@ -84,5 +84,3 @@ cc_test(
         "@googletest//:gtest_main",
     ],
 )
-
-

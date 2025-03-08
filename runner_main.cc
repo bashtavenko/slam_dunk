@@ -11,7 +11,6 @@
 // blaze run //:runner_main -- --usb_port=/dev/ttyUSB0
 // --out_path=/tmp/lidar.txtpb
 
-#include <google/protobuf/text_format.h>
 #include <fstream>
 #include <iostream>
 #include "absl/flags/flag.h"
@@ -22,6 +21,8 @@
 #include "lidar.h"
 #include "proto/lidar_response.pb.h"
 #include "proto_utils.h"
+#include "status_macros.h"
+#include "status_matchers.h"
 #include "visualizer_client.h"
 
 ABSL_FLAG(std::string, usb_port, "", "USB port");
@@ -35,17 +36,15 @@ ABSL_FLAG(int32_t, baud_rate, 115200, "Default baud rate for A1");
 // text proto format.
 absl::Status ScanAndSaveResponse(slam_dunk::Lidar& lidar) {
   auto scan_data = lidar.Scan();
-  if (!scan_data.ok()) return scan_data.status();
-  return slam_dunk::SaveToFile(scan_data.value(),
-                               absl::GetFlag(FLAGS_out_path));
+  RETURN_IF_ERROR(scan_data.status());
+  RETURN_IF_ERROR(
+      slam_dunk::SaveToFile(scan_data.value(), absl::GetFlag(FLAGS_out_path)));
 }
 
 absl::Status VisualizeFromFile(slam_dunk::VisualizerClient& client) {
-  absl::StatusOr<std::string> file_data =
-      slam_dunk::GetTextFromFile(absl::GetFlag(FLAGS_in_path));
-  if (!file_data.ok()) return file_data.status();
-
-  auto result = client.SendData(file_data->data());
+  ASSIGN_OR_RETURN(auto file_data,
+                   slam_dunk::GetTextFromFile(absl::GetFlag(FLAGS_in_path)));
+  auto result = client.SendData(file_data.data());
   if (!result.has_value())
     return absl::InternalError("Failed to send data Visualizer");
   LOG(INFO) << "Sent data to Visualizer: " << result.value();
@@ -57,13 +56,11 @@ absl::Status ShowRealTimeData(slam_dunk::Lidar& lidar,
   while (1) {
     auto scan_data = lidar.Scan();
     if (!scan_data.ok()) return scan_data.status();
-    auto data = ConvertScanResponseToTextProtoString(scan_data.value());
-    if (!data.ok()) return data.status();
-    auto result = client.SendData(data.value());
+    ASSIGN_OR_RETURN(auto data, ConvertScanResponseToTextProtoString(scan_data.value()));
+    auto result = client.SendData(data);
     if (!result.has_value())
       return absl::InternalError("Failed to send data to visualizer");
   }
-  return absl::OkStatus();
 }
 
 int main(int argc, char** argv) {

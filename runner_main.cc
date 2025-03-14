@@ -43,7 +43,7 @@ absl::Status ScanAndSaveResponse(slam_dunk::Lidar& lidar) {
 absl::Status VisualizeFromFile(slam_dunk::VisualizerClient& client) {
   ASSIGN_OR_RETURN(auto file_data,
                    slam_dunk::GetTextFromFile(absl::GetFlag(FLAGS_in_path)));
-  auto result = client.SendData(file_data.data());
+  const auto result = client.SendData(file_data.data());
   if (!result.has_value())
     return absl::InternalError("Failed to send data Visualizer");
   LOG(INFO) << "Sent data to Visualizer: " << result.value();
@@ -55,9 +55,9 @@ absl::Status ShowRealTimeData(slam_dunk::Lidar& lidar,
   while (1) {
     auto scan_data = lidar.Scan();
     if (!scan_data.ok()) return scan_data.status();
-    ASSIGN_OR_RETURN(auto data, ConvertScanResponseToTextProtoString(scan_data.value()));
-    auto result = client.SendData(data);
-    if (!result.has_value())
+    ASSIGN_OR_RETURN(auto data,
+                     ConvertScanResponseToTextProtoString(scan_data.value()));
+    if (auto result = client.SendData(data); !result.has_value())
       return absl::InternalError("Failed to send data to visualizer");
   }
 }
@@ -92,22 +92,21 @@ int main(int argc, char** argv) {
       LOG(ERROR) << lidar_status.status();
       return EXIT_FAILURE;
     }
-    auto& lidar = lidar_status.value();
+    const auto& lidar = lidar_status.value();
 
-    auto result = lidar->Scan();
-    if (!result.ok()) {
+    if (const auto result = lidar->Scan(); !result.ok()) {
       LOG(ERROR) << result.status();
       return EXIT_FAILURE;
     }
-    auto device_info = lidar->GetDeviceInfo();
+    auto [model, firmware, hardware, serial_number] = lidar->GetDeviceInfo();
     LOG(INFO) << absl::StreamFormat(
-        "Model: %s Firmware: %s Hardware: %s Serial: %s", device_info.model,
-        device_info.firmware, device_info.hardware, device_info.serial_number);
+        "Model: %s Firmware: %s Hardware: %s Serial: %s", model, firmware,
+        hardware, serial_number);
 
     // Show real-time data
     if (absl::GetFlag(FLAGS_visualizer_port) != 0) {
-      auto show_status = ShowRealTimeData(*lidar.get(), *client->get());
-      if (!show_status.ok()) {
+      if (auto show_status = ShowRealTimeData(*lidar.get(), *client->get());
+          !show_status.ok()) {
         LOG(ERROR) << show_status.message();
         return EXIT_FAILURE;
       }
@@ -115,7 +114,7 @@ int main(int argc, char** argv) {
 
     // Saving one scan
     if (!absl::GetFlag(FLAGS_out_path).empty()) {
-      auto status = ScanAndSaveResponse(*lidar.get());
+      status = ScanAndSaveResponse(*lidar.get());
       if (!status.ok()) {
         LOG(ERROR) << status.message();
         return EXIT_FAILURE;

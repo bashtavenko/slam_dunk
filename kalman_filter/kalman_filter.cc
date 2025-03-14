@@ -13,8 +13,8 @@ KalmanFilter::KalmanFilter(double dt, const Eigen::MatrixXd& A,
       m_(C.rows()),
       n_(A.rows()),
       dt_(dt),
-      initialized_(false),
       I_(n_, n_),
+      initialized_(false),
       x_hat_(n_),
       x_hat_new_(n_) {
   I_.setIdentity();

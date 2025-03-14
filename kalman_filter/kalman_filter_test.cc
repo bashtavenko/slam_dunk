@@ -16,7 +16,7 @@ TEST(KalmanFilter, BasicWorks) {
   const int n = 3;  // Number of states
   const int m = 1;  // Number of measurements
 
-  double dt = 1.0 / 30;  // Time step
+  constexpr double dt = 1.0 / 30;  // Time step
 
   Eigen::MatrixXd A(n, n);  // System dynamics matrix
   Eigen::MatrixXd C(m, n);  // Output matrix
@@ -37,7 +37,7 @@ TEST(KalmanFilter, BasicWorks) {
   KalmanFilter kf(dt, A, C, Q, R, P);
 
   // List of noisy position measurements (y)
-  std::vector<double> measurements = {
+  const std::vector<double> measurements = {
       1.04202710058,  1.10726790452,  1.2913511148,    1.48485250951,
       1.72825901034,  1.74216489744,  2.11672039768,   2.14529225112,
       2.16029641405,  2.21269371128,  2.57709350237,   2.6682215744,

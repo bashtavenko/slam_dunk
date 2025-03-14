@@ -22,7 +22,6 @@
 #include "proto/lidar_response.pb.h"
 #include "proto_utils.h"
 #include "status_macros.h"
-#include "status_matchers.h"
 #include "visualizer_client.h"
 
 ABSL_FLAG(std::string, usb_port, "", "USB port");

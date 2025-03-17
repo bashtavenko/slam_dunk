@@ -82,6 +82,6 @@ cc_test(
         "@absl//absl/status:status_matchers",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
-        "@protobuf-matchers//protobuf-matchers"
+        "@protobuf-matchers//protobuf-matchers",
     ],
 )

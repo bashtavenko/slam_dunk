@@ -10,9 +10,15 @@ class KalmanFilter {
   // Create a Kalman filter with the specified matrices.
   // A - System dynamics matrix
   // C - Output matrix
-  // Q - Process noise covariance
+  // Q - Process noise covariance.
+  //     Uncertainty in the process model. In static system it should be 0;
   // R - Measurement noise covariance
+  //     This is based on the sensor noise characteristic.
+  //     It tells the filter how much to trust the measurement.
   // P - Estimate error covariance
+  //     This is the key covariance that the filter updates after every
+  //     measurement. It reflects the uncertainty in the current
+  //     state estimate x_hat
   KalmanFilter(double dt, const Eigen::MatrixXd& A, const Eigen::MatrixXd& C,
                const Eigen::MatrixXd& Q, const Eigen::MatrixXd& R,
                const Eigen::MatrixXd& P);
@@ -36,8 +42,13 @@ class KalmanFilter {
   bool Update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd A);
 
   // Return the current state and time.
-  Eigen::VectorXd state() const { return x_hat_; };
+  Eigen::VectorXd State() const { return x_hat_; };
   double Time() const { return t_; };
+
+  Eigen::MatrixXd EstimateErrorCovariance() const { return P_; }
+  void SetMeasurementNoiseCovariance(const Eigen::MatrixXd& noise) {
+    R_ = noise;
+  }
 
  private:
   // Matrices for computation

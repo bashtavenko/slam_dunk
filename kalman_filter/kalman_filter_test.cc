@@ -66,11 +66,11 @@ TEST(KalmanFilter, BasicWorks) {
     kf.Update(y);
     LOG(INFO) << absl::StreamFormat(
         "t = %.2f y[%i] = %.2f x_hat[%i] = [%.2f, %.2f, %.2f]", t, i,
-        y.transpose().x(), i, kf.state().transpose()[0],
-        kf.state().transpose()[1], kf.state().transpose()[2]);
+        y.transpose().x(), i, kf.State().transpose()[0],
+        kf.State().transpose()[1], kf.State().transpose()[2]);
   }
   // This should be close to x0 -9.81, I guess.
-  EXPECT_THAT(kf.state().transpose()[2], DoubleNear(-9.2, kMaxAbsError));
+  EXPECT_THAT(kf.State().transpose()[2], DoubleNear(-9.2, kMaxAbsError));
 }
 
 }  // namespace

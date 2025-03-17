@@ -1,16 +1,40 @@
 cc_library(
     name = "kalman_filter",
-    hdrs = ['kalman_filter.h'],
     srcs = ["kalman_filter.cc"],
-    deps = ["@eigen//:eigen"],
+    hdrs = ["kalman_filter.h"],
+    deps = ["@eigen"],
 )
 
 cc_test(
     name = "kalman_filter_test",
     srcs = ["kalman_filter_test.cc"],
-    deps = [":kalman_filter",
-            "@googletest//:gtest_main",
-            "@glog",
-            "@absl//absl/strings:str_format",
-            "@eigen//:eigen"],
+    deps = [
+        ":kalman_filter",
+        "@absl//absl/strings:str_format",
+        "@eigen",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "one_dimension_test",
+    srcs = ["one_dimension_test.cc"],
+    deps = [
+        ":kalman_filter",
+        "@absl//absl/strings:str_format",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "two_dimensions_test",
+    srcs = ["two_dimensions_test.cc"],
+    deps = [
+        ":kalman_filter",
+        "@absl//absl/strings:str_format",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
 )

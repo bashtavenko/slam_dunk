@@ -2,7 +2,7 @@
 
 # Slamtec RPLidar visualization
 
-In this part I wanted to play with mechanical 2D lidar from Slamtec - show basic
+In this part I wanted to play with mechanical 2D lidar from Slamtec – show basic
 scan data in a plot without third-party software (except for QT and SDK) with
 something like that:
 
@@ -26,7 +26,7 @@ or probably `dialout`.
 
 ## Visualization
 
-If visualizer is running in a separate terminal, this shows real-time data from lidar
+If the visualizer is running in a separate terminal, this shows real-time data from lidar
 
 ```shell
 blaze run //:runner_main -- --usb_port=/dev/ttyUSB0 --visualizer_port=9000
@@ -48,14 +48,13 @@ blaze run //:runner_main -- --usb_port=/dev/ttyUSB0 --out_path=/tmp/lidar.txtpb
 
 ## More info
 
-Slamtec [SDK](https://github.com/Slamtec/rplidar_sdk) has the latest release in 2019 and the main branch was completely
-out of sync [issue](https://github.com/Slamtec/rplidar_sdk/issues/136). To get things moving
-I [forked](https://github.com/bashtavenko/rplidar_sdk) their SDK with
-fresh release url of 2025.
+Slamtec [SDK](https://github.com/Slamtec/rplidar_sdk) has the latest release in 2019, and the main branch was completely
+out of sync [issue](https://github.com/Slamtec/rplidar_sdk/issues/136). To get things moving,
+I [forked](https://github.com/bashtavenko/rplidar_sdk) their SDK with a fresh release url of 2025.
 
 The SDK has an ancient makefile. Bazel has a make rule in `rules_foreign_cc` but I could not make it
-working - [issue](https://github.com/bazelbuild/bazel/issues/24880).
-In order to work around I made a shell script that produces headers and static libraries in `third_party`.
+working - [issue](https://github.com/bazelbuild/bazel/issues/24880). I made a shell script that produces headers and
+static libraries in `third_party`.
 
 As I [mentioned](https://github.com/bashtavenko/qt_visualizer) I did not want for QT to usurp my project, I just wanted
-to have a quick fire-and-forget visualization in a simple polar chars.
+to have a quick fire-and-forget visualization in a simple polar char.

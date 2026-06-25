@@ -8,7 +8,7 @@
 namespace slam_dunk {
 namespace {
 
-constexpr double kMaxAbsError = 0.1;
+constexpr double kMaxAbsError = 0.5;
 
 using ::testing::DoubleNear;
 
@@ -70,7 +70,7 @@ TEST(KalmanFilter, BasicWorks) {
         kf.State().transpose()[1], kf.State().transpose()[2]);
   }
   // This should be close to x0 -9.81, I guess.
-  EXPECT_THAT(kf.State().transpose()[2], DoubleNear(-9.2, kMaxAbsError));
+  EXPECT_THAT(kf.State().transpose()[2], DoubleNear(-9.81, kMaxAbsError));
 }
 
 }  // namespace

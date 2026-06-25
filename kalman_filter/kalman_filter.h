@@ -1,4 +1,3 @@
-// Based on https://github.com/hmartiro/kalman-cpp
 #ifndef SLAM_DUNK_KALMAN_FILTER_KALMAN_FILTER_H_
 #define SLAM_DUNK_KALMAN_FILTER_KALMAN_FILTER_H_
 #include <Eigen/Eigen>
@@ -7,18 +6,12 @@ namespace slam_dunk {
 
 class KalmanFilter {
  public:
-  // Create a Kalman filter with the specified matrices.
-  // A - System dynamics matrix
-  // C - Output matrix
-  // Q - Process noise covariance.
-  //     Uncertainty in the process model. In static system it should be 0;
-  // R - Measurement noise covariance
-  //     This is based on the sensor noise characteristic.
-  //     It tells the filter how much to trust the measurement.
-  // P - Estimate error covariance
-  //     This is the key covariance that the filter updates after every
-  //     measurement. It reflects the uncertainty in the current
-  //     state estimate x_hat
+
+  // A - State transition matrix (n x n)
+  // C - Measurement/output matrix (m x n)
+  // Q - Process noise covariance (n x n)
+  // R - Measurement noise covariance (m x m)
+  // P - Initial estimate error covariance (n x n)
   KalmanFilter(double dt, const Eigen::MatrixXd& A, const Eigen::MatrixXd& C,
                const Eigen::MatrixXd& Q, const Eigen::MatrixXd& R,
                const Eigen::MatrixXd& P);
@@ -26,11 +19,23 @@ class KalmanFilter {
   // Create a blank estimator.
   KalmanFilter() {};
 
-  // Initialize the filter with initial states as zero.
+  // Initialize state to zero
   void Init();
 
-  // Initialize the filter with a guess for initial states.
+  // Initialize with a prior state guess at time t0
   void Init(double t0, const Eigen::VectorXd& x0);
+
+  // Time update (Predict)
+  // Propagates state and covariance forward using the process model.
+  // Returns true of successful.
+  bool Predict();
+  bool Predict(double dt, const Eigen::MatrixXd& A);  // variable-rate overload
+
+  // Measurement update (Correct)
+  // Incorporates a new sensor measurement y.
+  // Call independently per sensor at its own arrival rate.
+  // Returns false if the filter has not been initialized.
+  bool Correct(const Eigen::VectorXd& y);
 
   // Update the estimated state based on measured values. The
   // time step is assumed to remain constant. Returns true of successful.
@@ -39,12 +44,11 @@ class KalmanFilter {
   // Update the estimated state based on measured values,
   // using the given time step and dynamics matrix.
   // Returns true of successful.
-  bool Update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd A);
+  bool Update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd& A);
 
   // Return the current state and time.
   Eigen::VectorXd State() const { return x_hat_; };
   double Time() const { return t_; };
-
   Eigen::MatrixXd EstimateErrorCovariance() const { return P_; }
   void SetMeasurementNoiseCovariance(const Eigen::MatrixXd& noise) {
     R_ = noise;
@@ -79,7 +83,6 @@ class KalmanFilter {
 
   // Estimated states
   Eigen::VectorXd x_hat_;
-  Eigen::VectorXd x_hat_new_;
 };
 
 }  // namespace slam_dunk

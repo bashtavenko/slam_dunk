@@ -15,10 +15,7 @@ KalmanFilter::KalmanFilter(double dt, const Eigen::MatrixXd& A,
       dt_(dt),
       I_(n_, n_),
       initialized_(false),
-      x_hat_(n_),
-      x_hat_new_(n_) {
-  I_.setIdentity();
-}
+      x_hat_(n_) {}
 
 void KalmanFilter::Init(double t0, const Eigen::VectorXd& x0) {
   x_hat_ = x0;
@@ -31,27 +28,44 @@ void KalmanFilter::Init(double t0, const Eigen::VectorXd& x0) {
 void KalmanFilter::Init() {
   x_hat_.setZero();
   P_ = P0_;
-  t0_ = 0;
-  t_ = t0_;
+  t0_ = 0.0;
+  t_ = 0.0;
   initialized_ = true;
 }
 
-bool KalmanFilter::Update(const Eigen::VectorXd& y) {
+bool KalmanFilter::Predict() {
   if (!initialized_) return false;
-
-  x_hat_new_ = A_ * x_hat_;
+  x_hat_ = A_ * x_hat_;
   P_ = A_ * P_ * A_.transpose() + Q_;
-  K_ = P_ * C_.transpose() * (C_ * P_ * C_.transpose() + R_).inverse();
-  x_hat_new_ += K_ * (y - C_ * x_hat_new_);
-  P_ = (I_ - K_ * C_) * P_;
-  x_hat_ = x_hat_new_;
-
   t_ += dt_;
   return true;
 }
 
+bool KalmanFilter::Predict(double dt, const Eigen::MatrixXd& A) {
+  if (!initialized_) return false;
+  dt_ = dt;
+  A_ = A;
+  return Predict();
+}
+
+bool KalmanFilter::Correct(const Eigen::VectorXd& y) {
+  if (!initialized_) return false;
+  // TODO: Inverse is not a good idea. Use Cholesky
+  K_ = P_ * C_.transpose() * (C_ * P_ * C_.transpose() + R_).inverse();
+  x_hat_ += K_ * (y - C_ * x_hat_);
+  // TODO: Joseph form is better for stability
+  P_ = (I_ - K_ * C_) * P_;
+  return true;
+}
+
+bool KalmanFilter::Update(const Eigen::VectorXd& y) {
+  if (!initialized_) return false;
+  Predict();
+  return Correct(y);
+}
+
 bool KalmanFilter::Update(const Eigen::VectorXd& y, double dt,
-                          const Eigen::MatrixXd A) {
+                          const Eigen::MatrixXd& A) {
   A_ = A;
   dt_ = dt;
   return Update(y);

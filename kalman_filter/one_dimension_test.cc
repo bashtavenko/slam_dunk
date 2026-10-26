@@ -5,7 +5,7 @@
 #include "kalman_filter/kalman_filter.h"
 
 namespace slam_dunk {
-namespace kalman_filter {
+namespace  {
 
 // For a static system, the KF isn’t “tracking” a moving state but is instead
 // used to improve the estimate of a constant parameter (here, the equilibrium
@@ -127,5 +127,5 @@ TEST(MeasurementFusionTest, TapeAndLaser) {
   EXPECT_NEAR(fused_estimate, 102.02, 0.5);
 }
 
-}  // namespace kalman_filter
+}  // namespace
 }  // namespace slam_dunk

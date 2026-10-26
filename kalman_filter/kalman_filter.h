@@ -37,13 +37,10 @@ class KalmanFilter {
   // Returns false if the filter has not been initialized.
   bool Correct(const Eigen::VectorXd& y);
 
-  // Update the estimated state based on measured values. The
-  // time step is assumed to remain constant. Returns true of successful.
+  //  Single-step operation. Predict + correct.
   bool Update(const Eigen::VectorXd& y);
 
-  // Update the estimated state based on measured values,
-  // using the given time step and dynamics matrix.
-  // Returns true of successful.
+  // Single-step operation. Has optional A and dt
   bool Update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd& A);
 
   // Return the current state and time.

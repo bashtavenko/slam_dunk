@@ -40,3 +40,14 @@ cc_test(
         "@googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "sensor_fusion_test",
+    srcs = ["sensor_fusion_test.cc"],
+    deps = [
+        ":kalman_filter",
+        "@absl//absl/strings:str_format",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
+)

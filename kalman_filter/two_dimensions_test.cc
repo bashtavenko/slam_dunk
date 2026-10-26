@@ -3,7 +3,8 @@
 #include "gtest/gtest.h"
 #include "kalman_filter/kalman_filter.h"
 
-namespace slam_dunk::kalman_filter {
+namespace slam_dunk {
+namespace {
 TEST(MobileRobotKFTest, UltrasonicMeasurementUpdate) {
   // Suppose we have a 2D state: [position, velocity]
   constexpr int n = 2;
@@ -59,4 +60,5 @@ TEST(MobileRobotKFTest, UltrasonicMeasurementUpdate) {
   LOG(INFO) << absl::StreamFormat("Updated position: %.3f, velocity: %.3f",
                                   x_est(0), x_est(1));
 }
-}  // namespace slam_dunk::kalman_filter
+} // namespace
+} // namespace slam_dunk::kalman_filter

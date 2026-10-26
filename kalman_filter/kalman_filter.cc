@@ -50,10 +50,10 @@ bool KalmanFilter::Predict(double dt, const Eigen::MatrixXd& A) {
 
 bool KalmanFilter::Correct(const Eigen::VectorXd& y) {
   if (!initialized_) return false;
-  // TODO: Inverse is not a good idea. Use Cholesky
+  // TODO: Cholesky
   K_ = P_ * C_.transpose() * (C_ * P_ * C_.transpose() + R_).inverse();
   x_hat_ += K_ * (y - C_ * x_hat_);
-  // TODO: Joseph form is better for stability
+  // TODO: Joseph form
   P_ = (I_ - K_ * C_) * P_;
   return true;
 }
